@@ -1,44 +1,31 @@
-# Valu iFrame Sample App
+# React Sample App for `@arkeytyp/valu-api`
 
-This is a sample application demonstrating the usage of iFrame API integration.
+This is a **one-page React application** that demonstrates how to use the [`@arkeytyp/valu-api`](https://www.npmjs.com/package/@arkeytyp/valu-api) library.  
 
-## Setup
+The app includes:
+- **Action buttons** to interact with the main Valu application.
+- A **terminal UI** for testing various API commands.
+- **Automatic integration** with Valu API when opened as an **iFrame app** inside Valu Social.
 
-1. Install dependencies:
-```bash
+---
+
+## 🚀 Features
+- **Button-based interactions** with the Valu API.
+- **Command terminal UI** to manually test API functions.
+- **Works only inside Valu Social** when embedded as an iFrame app.
+
+---
+
+## 📦 Installation
+Clone the repository and install dependencies:
+```sh
+git clone https://github.com/your-username/valu-api-sample-app.git
+cd valu-api-sample-app
 npm install
 ```
 
-2. Start development server:
-```bash
-npm run dev
-```
+🤝 Contributing
+Feel free to submit pull requests or report issues!
 
-3. Build for production:
-```bash
-npm run build
-```
-
-## Features
-
-- Interactive console with command history
-- API version selection
-- Sample API calls
-- Loading states and error handling
-- Documentation links
-
-## Technology Stack
-
-- React + Vite
-- TypeScript
-- Tailwind CSS
-- shadcn/ui components
-- Lucide Icons
-
-## Available Commands
-
-- help - Shows available commands
-- getUser - Gets user information
-- listItems - Lists sample items
-- status - Checks API status
-- clear - Clears the console
+📄 License
+MIT License © 2025
