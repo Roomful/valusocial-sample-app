@@ -24,8 +24,8 @@ cd valu-api-sample-app
 npm install
 ```
 
-🤝 Contributing
+## 🤝 Contributing
 Feel free to submit pull requests or report issues!
 
-📄 License
+## 📄 License
 MIT License © 2025
