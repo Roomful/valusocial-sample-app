@@ -20,8 +20,6 @@ export default function SampleApiCalls() {
     const usersApi = await valuApi.getApi('users')
     const currentUser = await usersApi.run('current');
 
-    console.log(currentUser)
-
     const textChatApi = await valuApi.getApi('chat')
     textChatApi.run('open-channel', {userId: currentUser.id});
   }

@@ -13,8 +13,14 @@ export default function Footer() {
           <a href="https://www.npmjs.com/package/@arkeytyp/valu-api" className="text-blue-600 hover:underline">
             NPM Package
           </a>
-          <a href="https://github.com/Roomful/valu-api?tab=readme-ov-file#usage" className="text-blue-600 hover:underline">
+          <a href="https://github.com/Roomful/valu-api?tab=readme-ov-file#install"
+             className="text-blue-600 hover:underline">
             Documentation
+          </a>
+
+          <a href="https://github.com/Roomful/valusocial-sample-appe"
+             className="text-blue-600 hover:underline">
+            Application Code
           </a>
         </div>
       </div>
