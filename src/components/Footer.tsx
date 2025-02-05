@@ -18,7 +18,7 @@ export default function Footer() {
             Documentation
           </a>
 
-          <a href="https://github.com/Roomful/valusocial-sample-appe"
+          <a href="https://github.com/Roomful/valusocial-sample-app"
              className="text-blue-600 hover:underline">
             Application Code
           </a>
