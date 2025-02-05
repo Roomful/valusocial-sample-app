@@ -19,7 +19,7 @@ The app includes:
 ## 📦 Installation
 Clone the repository and install dependencies:
 ```sh
-git clone https://github.com/your-username/valu-api-sample-app.git
+git clone https://github.com/Roomful/valu-api-sample-app.git
 cd valu-api-sample-app
 npm install
 ```
