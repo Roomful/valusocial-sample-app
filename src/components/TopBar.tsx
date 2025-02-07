@@ -34,7 +34,7 @@ export default function TopBar() {
 
 
   return (
-    <header className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 shadow-md">
+    <header className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
         <h1 className="text-2xl font-bold">Valu iFrame Sample App</h1>
         <div className="flex items-center space-x-2">

@@ -89,6 +89,20 @@
   margin-bottom: 0.5em;
 }
 
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 200px; /* Set a fixed width */
+}
+
+
+.console-output h2 {
+  color: #e6e6e6;
+  font-size: 1em;
+  margin-bottom: 0.5em;
+}
+
 .console-output p {
   margin-bottom: 0.5em;
 }

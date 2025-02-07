@@ -17,16 +17,24 @@ export default function SampleApiCalls() {
 
 
   const OpenCurrentUserChat = async () => {
-    const usersApi = await valuApi.getApi('users')
-    const currentUser = await usersApi.run('current');
+    if(valuApi === null)
+      return
 
-    const textChatApi = await valuApi.getApi('chat')
-    textChatApi.run('open-channel', {userId: currentUser.id});
+    try{
+      const usersApi = await valuApi.getApi('users')
+      const currentUser = await usersApi.run('current');
+
+      const textChatApi = await valuApi.getApi('chat')
+      await textChatApi.run('open-channel', {userId: currentUser.id});
+    }
+    catch(error) {
+      console.error(error);
+    }
   }
 
   const OpenVideoChat = async () => {
-    const videoChatApi = await valuApi.getApi('video-chat')
-    await videoChatApi.run('open');
+    const videoChatApi = await valuApi?.getApi('video-chat')
+    await videoChatApi?.run('open');
   }
 
   return (

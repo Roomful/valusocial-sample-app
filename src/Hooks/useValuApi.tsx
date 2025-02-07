@@ -1,8 +1,8 @@
-import {useEffect, useRef, useState} from "react";
-import {ValuApi} from '@arkeytyp/valu-api/';
+import {useEffect, useState} from "react";
+import {ValuApi} from "@arkeytyp/valu-api"
 
-export const useValuAPI = () => {
-    const [valuApi, setValuApi] = useState(null);
+export const useValuAPI = (): ValuApi | null => {
+    const [valuApi, setValuApi] = useState<ValuApi | null>(null);
 
     useEffect(() => {
 
@@ -16,7 +16,7 @@ export const useValuAPI = () => {
         if(valuApi.connected) {
             setValuApi(valuApi);
         } else {
-            valuApi.addEventListener(ValuApi.API_READY, async (e) => {
+            valuApi.addEventListener(ValuApi.API_READY, async () => {
                 setValuApi(valuApi);
             });
         }

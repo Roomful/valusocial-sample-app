@@ -5,17 +5,13 @@ import {Input} from "@/components/ui/input"
 import {Button} from "@/components/ui/button"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 import {Loader2, Send} from "lucide-react"
-import {APIPointer} from '@arkeytyp/valu-api/src/APIPointer';
+import {APIPointer} from '@arkeytyp/valu-api'
 import {useValuAPI} from "@/Hooks/useValuApi.tsx";
 
 type ConsoleEntry = {
   type: "input" | "output" | "error"
   content: string
 }
-
-const CONSOLE_ERROR: string = "error";
-const CONSOLE_IN: string = "input";
-const CONSOLE_OUT: string = "output";
 
 export function Console() {
   const [apiName, setApiName] = useState("")
@@ -29,7 +25,7 @@ export function Console() {
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const apiPointer = useRef<APIPointer>(null)
+  const apiPointer = useRef<APIPointer | null>(null)
 
 
   useEffect(() => {
@@ -38,7 +34,7 @@ export function Console() {
       return;
 
     setIsLoading('');
-    addToConsole(CONSOLE_IN, 'Connected to Valu App.')
+    addToConsole('input', 'Connected to Valu App!')
 
   }, [valuApi]);
 
@@ -51,7 +47,7 @@ export function Console() {
     if (runningInIFrame) {
       setIsLoading('Waiting Valu Connection...');
     } else {
-      addToConsole(CONSOLE_IN, 'Demo mode initialized.')
+      addToConsole('input', 'Demo mode initialized!')
     }
 
   }, []);
@@ -61,13 +57,13 @@ export function Console() {
       return;
 
     if (!valuApi) {
-      addToConsole(CONSOLE_ERROR, 'Only available when connected to the Valu app.')
+      addToConsole('error', 'Only available when connected to the Valu app.')
       return
     }
 
     if (apiName === 'none') {
       apiPointer.current = null;
-      addToConsole(CONSOLE_OUT, `Api context cleared`);
+      addToConsole('output', `Api context cleared`);
       return;
     }
 
@@ -79,11 +75,11 @@ export function Console() {
         const apiVersion = isNaN(version) ? undefined : version;
         apiPointer.current = await valuApi.getApi(apiName, apiVersion);
 
-        addToConsole(CONSOLE_OUT, `Api context set: ${apiPointer.current.apiName} v${apiPointer.current.version}`);
+        addToConsole('output', `Api context set: ${apiPointer.current.apiName} v${apiPointer.current.version}`);
       } catch (error) {
         apiPointer.current = null;
-        addToConsole(CONSOLE_ERROR, error.message);
-        addToConsole(CONSOLE_OUT, `Api context cleared`);
+        addToConsole('error', (error as Error).message);
+        addToConsole('output', `Api context cleared`);
       } finally {
         setIsLoading('');
       }
@@ -150,20 +146,24 @@ function greet(name) {
       }),
   }
 
-  const addToConsole = (type, content) => {
+  const addToConsole = (type:ConsoleEntry['type'] , content : string) => {
     setConsoleEntries((prev) => [
       ...prev,
       {type: type, content: content},
     ])
   };
 
+  const isHelpArgument = (arg: string): boolean => {
+    return ['help', 'h', '-help', '-h'].includes(arg);
+  };
+
   const handleExecute = async () => {
 
     let cmd = command;
     if (apiPointer.current != null) {
-      addToConsole(CONSOLE_IN, `${apiPointer.current.apiName} v${apiPointer.current.version} > ${command}`)
+      addToConsole('input', `${apiPointer.current.apiName} v${apiPointer.current.version} > ${command}`)
     } else {
-      addToConsole(CONSOLE_IN, `> ${command}`)
+      addToConsole('input', `> ${command}`)
     }
 
     setIsLoading("Executing command...")
@@ -179,40 +179,47 @@ function greet(name) {
         let response: string;
         if (apiPointer.current != null) {
 
-          let result;
-          if (args.length === 1) {
-            result = await apiPointer.current.run(funcName, args[0]);
+          if(args.length === 0 && isHelpArgument(funcName)) {
+            response = await valuApi?.runConsoleCommand(`${funcName} ${apiPointer.current.apiName} `);
           } else {
+            let result;
+            if (args.length === 1) {
 
-            let funcParams: Record<string, string | null> = {};
-            for (let i = 0; i < args.length; i += 2) {
-              let key = args[i];
-              if (key.startsWith('-')) {
-                key = key.slice(1)
+              if(isHelpArgument(args[0])) {
+                result = await valuApi?.runConsoleCommand(`${args[0]} ${apiPointer.current.apiName} ${funcName}`);
+              } else {
+                result = await apiPointer.current.run(funcName, args[0]);
               }
-              funcParams[key] = args[i + 1] ?? null;
-            }
-
-            console.log(funcParams);
-            result = await apiPointer.current.run(funcName, funcParams);
-          }
 
 
-          if (result === undefined) {
-            response = 'Execution completed.';
-          } else {
-            if (typeof result === "string") {
-              response = result;
             } else {
-              response = JSON.stringify(result);
+              let funcParams: Record<string, string | null> = {};
+              for (let i = 0; i < args.length; i += 2) {
+                let key = args[i];
+                if (key.startsWith('-')) {
+                  key = key.slice(1)
+                }
+                funcParams[key] = args[i + 1] ?? null;
+              }
+
+              result = await apiPointer.current.run(funcName, funcParams);
+            }
+
+            if (result === undefined) {
+              response = 'Execution completed.';
+            } else {
+              if (typeof result === "string") {
+                response = result;
+              } else {
+                response = JSON.stringify(result);
+              }
             }
           }
-
         } else {
-          response = await valuApi.runConsoleCommand(cmd);
+          response = await valuApi?.runConsoleCommand(cmd);
         }
 
-        addToConsole(CONSOLE_OUT, response);
+        addToConsole('output', response);
 
       } else {
         // Add a delay to simulate network latency
@@ -220,13 +227,13 @@ function greet(name) {
 
         if (funcName in sampleFunctions) {
           const result = await sampleFunctions[funcName as keyof typeof sampleFunctions](args)
-          addToConsole(CONSOLE_OUT, result)
+          addToConsole('output', result)
         } else {
           throw new Error(`Unknown command: ${funcName}`)
         }
       }
     } catch (error) {
-      addToConsole(CONSOLE_ERROR, (error as Error).message);
+      addToConsole('error', (error as Error).message);
     } finally {
       setIsLoading('')
       setCommand("")
@@ -236,24 +243,24 @@ function greet(name) {
 
   const renderConsoleEntry = (entry: ConsoleEntry) => {
     if (entry.type === "error" || entry.content.startsWith("Error")) {
-      return <div className="text-red-500">{entry.content}</div>
+      return <div className="text-red-500 console-line">{entry.content}</div>
     }
     if (entry.type === "input") {
-      return <div className="text-yellow-400 font-bold">{entry.content}</div>
+      return <div className="text-yellow-400 font-bold console-line">{entry.content}</div>
     }
 
     try {
       const jsonObj = JSON.parse(entry.content)
-      return <pre className="whitespace-pre-wrap">{JSON.stringify(jsonObj, null, 2)}</pre>
+      return <pre className="whitespace-pre-wrap console-line">{JSON.stringify(jsonObj, null, 2)}</pre>
     } catch {
-      return <div className="console-output" dangerouslySetInnerHTML={{__html: entry.content}}/>
+      return <div className="console-output console-line" dangerouslySetInnerHTML={{__html: entry.content}}/>
     }
   }
 
   return (
-    <div className="bg-gray-100 p-4 rounded-lg mb-8">
+    <div className="bg-gray-100 p-4 rounded-lg mb-8 overflow-clip">
       <div className="flex space-x-4 mb-4">
-        <Select onValueChange={setApiName} disabled={isLoading}>
+        <Select onValueChange={setApiName} disabled={!!isLoading}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Select API"/>
           </SelectTrigger>
@@ -266,7 +273,7 @@ function greet(name) {
           </SelectContent>
         </Select>
         <Input
-          disabled={isLoading}
+          disabled={!!isLoading}
           placeholder="API Version (optional)"
           value={apiVersion}
           onChange={(e) => setApiVersion(e.target.value)}
@@ -280,7 +287,7 @@ function greet(name) {
       >
         <div className="min-h-full">
           {consoleEntries.map((entry, index) => (
-            <div key={index}>{renderConsoleEntry(entry)}</div>
+            <div className='console-line' key={index}>{renderConsoleEntry(entry)}</div>
           ))}
           {isLoading && (
             <div className="text-yellow-400 font-bold flex items-center space-x-2">
@@ -299,11 +306,11 @@ function greet(name) {
           onChange={(e) => setCommand(e.target.value)}
           onKeyPress={(e) => e.key === "Enter" && !isLoading && handleExecute()}
           className="flex-grow"
-          disabled={isLoading}
+          disabled={!!isLoading}
         />
         <Button
           onClick={handleExecute}
-          disabled={isLoading}
+          disabled={!!isLoading}
           className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200"
         >
           {isLoading ? (
